@@ -37,12 +37,12 @@ public class Maze : MonoBehaviour {
 
     void CreateWalls()
     {
-        initialPosition = new Vector3(-2.2f, 0.5f, 6.4f); //new Vector3((-xSize/2) + wallLength/2, 0.0f, (-ySize * 2) + wallLength / 2);
+        initialPosition = new Vector3((-xSize / 2) + wallLength / 2, 0.0f, (-ySize * 2) + wallLength / 2); //new Vector3(-2.2f, 0.5f, 6.4f); 
         Vector3 mypos = initialPosition;
         GameObject templWall;
 
         //For x axis
-        for (int i = -1; i < ySize + 1; i++)
+        for (int i = 0; i < ySize; i++)
         {
             for (int j = 0; j <= xSize; j++)
             {
@@ -56,9 +56,9 @@ public class Maze : MonoBehaviour {
         //For y axis
         for (int i = 0; i <= ySize; i++)
         {
-            for (int j = 0; j <= xSize + 1; j++)
+            for (int j = 0; j < xSize; j++)
             {
-                mypos = new Vector3(initialPosition.x + (j * wallLength) - wallLength, 0.5f, initialPosition.z + (i * wallLength) - wallLength);
+                mypos = new Vector3(initialPosition.x + (j * wallLength), 0.5f, initialPosition.z + (i * wallLength) - wallLength);
                 templWall = Instantiate(wall, mypos, Quaternion.Euler(0.0f,90.0f,0.0f)) as GameObject;
                 templWall.transform.parent = wallHolder.transform;
             }
@@ -74,11 +74,11 @@ public class Maze : MonoBehaviour {
         lastCells = new List<int>();
         lastCells.Clear();
          
-        totalCells = (xSize + 1) * (ySize + 1);
+        totalCells = xSize * ySize;
 
         int childrenCount = wallHolder.transform.childCount;
         GameObject[] allWalls = new GameObject[childrenCount];
-        cells = new Cell[(xSize + 1) * (ySize + 1)];
+        cells = new Cell[xSize * ySize];
         int eastWestProcess = 0;
         int childProcess = 0;
         int termcount = 0;
@@ -94,9 +94,9 @@ public class Maze : MonoBehaviour {
         {
             cells[cellProcess] = new Cell();
             cells[cellProcess].east = allWalls[eastWestProcess];
-            cells[cellProcess].south = allWalls[childProcess + (xSize + 2) * ySize + 1];
+            cells[cellProcess].south = allWalls[childProcess + (xSize + 1) * ySize];
 
-            if (termcount == xSize + 1)
+            if (termcount == xSize)
             {
                 eastWestProcess += 2;
                 termcount = 0;
@@ -109,7 +109,7 @@ public class Maze : MonoBehaviour {
             termcount++;
             childProcess++;
             cells[cellProcess].west = allWalls[eastWestProcess];
-            cells[cellProcess].north = allWalls[(childProcess + (xSize + 2) * ySize + 1) + xSize];
+            cells[cellProcess].north = allWalls[((childProcess + (xSize + 1) * ySize) + xSize - 1)];
         }
 
         CreateMaze();
@@ -146,8 +146,7 @@ public class Maze : MonoBehaviour {
 
 
         }
-
-        Debug.Log("Finished");
+      
 
     }
 
@@ -159,7 +158,7 @@ public class Maze : MonoBehaviour {
             case 2: Destroy(cells[currentCell].east); break;
             case 3: Destroy(cells[currentCell].west); break;
             case 4: Destroy(cells[currentCell].south); break;
-        }
+        } 
 
     }
 
@@ -171,10 +170,10 @@ public class Maze : MonoBehaviour {
         int check = 0;
         int[] connectingWall = new int[4];
 
-        check = ((currentCell + 1) / (xSize + 1));
+        check = ((currentCell + 1) / (xSize));
         check -= 1;
-        check *= xSize + 1;
-        check += xSize + 1;
+        check *= xSize;
+        check += xSize;
 
 
         //west wall
@@ -200,22 +199,22 @@ public class Maze : MonoBehaviour {
         }
 
         //north wall
-        if (currentCell + (xSize + 1) < totalCells)
+        if (currentCell + xSize < totalCells)
         {
-            if (cells[currentCell + (xSize + 1)].visited == false)
+            if (cells[currentCell + xSize].visited == false)
             {
-                neighbours[length] = currentCell + (xSize + 1);
+                neighbours[length] = currentCell + xSize;
                 connectingWall[length] = 1;
                 length++;
             }
         }
          
         //south wall
-        if (currentCell - (xSize + 1) >= 0)
+        if (currentCell - xSize >= 0)
         {
-            if (cells[currentCell - (xSize + 1)].visited == false)
+            if (cells[currentCell - xSize].visited == false)
             {
-                neighbours[length] = currentCell - (xSize + 1);
+                neighbours[length] = currentCell - xSize;
                 connectingWall[length] = 4;
                 length++;
             }
